@@ -1,27 +1,36 @@
-import { describe, it, expect, test } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
-import user from "@testing-library/user-event";
+import { render, screen } from "@testing-library/react";
+import { expect, test } from "vitest";
 import App from "./App";
+import userEvent from "@testing-library/user-event";
 
-describe("A truthy statement", () => {
-  it("should be equal to 2", () => {
-    expect(1 + 1).toEqual(2);
-  });
-});
+const userName = {
+  name: "ikram",
+  email: "mohamedikramks7@gmail.ocm",
+};
 
-test("show 6 products by default", async () => {
+test("Can recieve a new user and show it on list", async () => {
   render(<App />);
-  const titles = await screen.findAllByRole("heading");
-  expect(titles).toHaveLength(6);
-});
-
-test("clicking on load more button should load 6 products", async () => {
-  render(<App />);
-  const button = await screen.findByRole("button", { name: /load more/i })[0];
-
-  user.click(button);
-  await waitFor(async () => {
-    const titles = await screen.findAllByRole("heading");
-    expect(titles).toHaveLength(12);
+  const nameInput = screen.getByRole("textbox", {
+    name: /name/i,
   });
+  const emailInput = screen.getByRole("textbox", {
+    name: /email/i,
+  });
+
+  const button = screen.getByRole("button");
+
+  await userEvent.click(nameInput);
+  await userEvent.keyboard(userName.name);
+
+  await userEvent.click(emailInput);
+  await userEvent.keyboard(userName.email);
+
+  await userEvent.click(button);
+
+  //   screen.debug();
+  const name = screen.getByRole("cell", { name: userName.name });
+  const email = screen.getByRole("cell", { name: userName.email });
+
+  expect(name).toBeInTheDocument();
+  expect(email).toBeInTheDocument();
 });
